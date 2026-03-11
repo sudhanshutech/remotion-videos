@@ -5,25 +5,27 @@ interface AnimatedTextProps {
   text: string;
   startFrame: number;
   style?: CSSProperties;
+  durationInFrames?: number;
 }
 
 export const AnimatedText: React.FC<AnimatedTextProps> = ({ 
   text, 
   startFrame, 
-  style 
+  style,
+  durationInFrames = 20,
 }) => {
   const frame = useCurrentFrame();
   
   const opacity = interpolate(
     frame,
-    [startFrame, startFrame + 20],
+    [startFrame, startFrame + durationInFrames],
     [0, 1],
     { extrapolateRight: "clamp" }
   );
   
   const translateY = interpolate(
     frame,
-    [startFrame, startFrame + 20],
+    [startFrame, startFrame + durationInFrames],
     [30, 0],
     { extrapolateRight: "clamp" }
   );

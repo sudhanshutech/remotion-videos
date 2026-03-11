@@ -1,12 +1,13 @@
 import React from "react";
 import { Composition } from "remotion";
 import { SafeDepMCPVideo } from "./Video";
-
-const SCENE_1_FRAMES = 270;
-const SCENE_2_FRAMES = 270;
-const SCENE_3_FRAMES = 330;
-const SCENE_4_FRAMES = 210;
-const TRANSITION_FRAMES = 30;
+import {
+  SCENE_1_FRAMES,
+  SCENE_2_FRAMES,
+  SCENE_3_FRAMES,
+  SCENE_4_FRAMES,
+  TRANSITION_FRAMES,
+} from "./utils/constants";
 
 export const RemotionRoot: React.FC = () => {
   return (

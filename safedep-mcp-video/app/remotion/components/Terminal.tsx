@@ -1,5 +1,4 @@
-import { useCurrentFrame, interpolate, Easing } from "remotion";
-import { useState, useEffect } from "react";
+import { interpolate, useCurrentFrame } from "remotion";
 
 interface TerminalLine {
   text: string;
@@ -11,32 +10,40 @@ interface TerminalLine {
 interface TerminalProps {
   lines: TerminalLine[];
   title?: string;
+  typingSpeed?: number;
+  minHeight?: number;
 }
 
-export const Terminal: React.FC<TerminalProps> = ({ lines, title = "Terminal" }) => {
+export const Terminal: React.FC<TerminalProps> = ({
+  lines,
+  title = "Terminal",
+  typingSpeed = 1,
+  minHeight = 220,
+}) => {
   const frame = useCurrentFrame();
 
-  // Typing animation speed (characters per frame)
-  const typingSpeed = 2;
-
   return (
-    <div style={{
-      backgroundColor: "#0D1117", // GitHub dark background
-      borderRadius: "12px",
-      overflow: "hidden",
-      boxShadow: "0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05)",
-      fontFamily: "JetBrains Mono, Fira Code, monospace",
-    }}>
-      {/* Window Chrome */}
-      <div style={{
-        backgroundColor: "#161B22",
-        padding: "12px 16px",
-        display: "flex",
-        alignItems: "center",
-        gap: "8px",
-        borderBottom: "1px solid rgba(255, 255, 255, 0.05)",
-      }}>
-        {/* Traffic Lights */}
+    <div
+      style={{
+        background:
+          "linear-gradient(180deg, rgba(10, 18, 30, 0.98), rgba(5, 10, 18, 0.98))",
+        borderRadius: 22,
+        overflow: "hidden",
+        boxShadow: "0 30px 80px rgba(0, 0, 0, 0.4)",
+        border: "1px solid rgba(148, 163, 184, 0.16)",
+        fontFamily: "JetBrains Mono, Fira Code, monospace",
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: "rgba(15, 23, 42, 0.95)",
+          padding: "14px 18px",
+          display: "flex",
+          alignItems: "center",
+          gap: "10px",
+          borderBottom: "1px solid rgba(255, 255, 255, 0.06)",
+        }}
+      >
         <div style={{ display: "flex", gap: "8px" }}>
           <div style={{
             width: "12px",
@@ -57,39 +64,36 @@ export const Terminal: React.FC<TerminalProps> = ({ lines, title = "Terminal" })
             backgroundColor: "#27C93F",
           }} />
         </div>
-
-        {/* Title */}
         <div style={{
           flex: 1,
           textAlign: "center",
           fontSize: "13px",
-          color: "#8B949E",
-          fontWeight: "500",
+          color: "#A8B3C7",
+          fontWeight: "600",
+          letterSpacing: "0.2px",
         }}>
           {title}
         </div>
-
-        {/* Spacer for symmetry */}
         <div style={{ width: "76px" }} />
       </div>
-
-      {/* Terminal Content */}
       <div style={{
-        padding: "24px",
-        minHeight: "200px",
+        padding: "24px 28px",
+        minHeight,
       }}>
         {lines.map((line, index) => {
+          const lineVisibility = interpolate(
+            frame,
+            [line.delay - 6, line.delay],
+            [0, 1],
+            { extrapolateLeft: "clamp", extrapolateRight: "clamp" }
+          );
           const shouldShow = frame >= line.delay;
-          const framesSinceShow = frame - line.delay;
+          const framesSinceShow = Math.max(0, frame - line.delay);
           const charsToShow = Math.min(
-            Math.floor(framesSinceShow / typingSpeed),
+            Math.floor(framesSinceShow * typingSpeed),
             line.text.length
           );
-          
-          const displayText = shouldShow 
-            ? line.text.substring(0, charsToShow)
-            : "";
-          
+          const displayText = shouldShow ? line.text.substring(0, charsToShow) : "";
           const showCursor = shouldShow && charsToShow < line.text.length;
 
           return (
@@ -97,11 +101,12 @@ export const Terminal: React.FC<TerminalProps> = ({ lines, title = "Terminal" })
               key={index}
               style={{
                 color: line.color || "#58A6FF",
-                marginBottom: "8px",
+                marginBottom: "10px",
                 fontSize: "18px",
-                lineHeight: "1.6",
+                lineHeight: "1.65",
                 fontFamily: "JetBrains Mono, monospace",
-                opacity: shouldShow ? 1 : 0,
+                opacity: lineVisibility,
+                transform: `translateY(${(1 - lineVisibility) * 8}px)`,
                 display: "flex",
                 alignItems: "center",
               }}

@@ -1,161 +1,221 @@
-import { AbsoluteFill, interpolate, useCurrentFrame, spring, useVideoConfig, staticFile } from "remotion";
+import { AbsoluteFill, interpolate, spring, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { Terminal } from "../components/Terminal";
+import { TEST_PACKAGE } from "../utils/constants";
 
 export const Scene1_Problem: React.FC = () => {
   const frame = useCurrentFrame();
-  const { fps } = useVideoConfig();
+  const { fps, durationInFrames } = useVideoConfig();
+  const bgImage = staticFile("brand-bg.png");
 
-  // Import background
-  const bgImage = staticFile("brand-bg.png"); // adjust filename
-
-  const titleOpacity = spring({
-    frame: frame - 10,
+  const contentSpring = spring({
+    frame: frame,
     fps,
-    config: { damping: 100 },
+    config: { damping: 120, stiffness: 120 },
   });
 
-  const terminalAppear = spring({
-    frame: frame - 80,
-    fps,
-    config: { damping: 80 },
+  const timelineOpacity = interpolate(frame, [90, 130], [0, 1], {
+    extrapolateLeft: "clamp",
+    extrapolateRight: "clamp",
   });
+
+  const sceneOpacity = interpolate(
+    frame,
+    [0, 8, durationInFrames - 14, durationInFrames - 4],
+    [0, 1, 1, 0],
+    {
+      extrapolateLeft: "clamp",
+      extrapolateRight: "clamp",
+    }
+  );
 
   return (
-    <AbsoluteFill style={{ 
-      backgroundColor: "#0a0a0a",
-      position: "relative",
-    }}>
-      {/* Background Image */}
-      <div style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundImage: `url(${bgImage})`,
-        backgroundSize: "cover",
-        backgroundPosition: "center",
-        opacity: 0.7, // Adjust opacity so text is readable
-        filter: "blur(0px)", // Add blur if needed
-      }} />
-
-      {/* Dark overlay for better text contrast */}
-      <div style={{
-        position: "absolute",
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        backgroundColor: "rgba(10, 10, 10, 0.6)", // Semi-transparent overlay
-      }} />
-
-      {/* Content (relative positioning so it's above background) */}
-      <div style={{
-        position: "relative",
-        zIndex: 1,
-        padding: "80px",
-        height: "100%",
-      }}>
-        {/* Timestamp */}
-        <div style={{
+    <AbsoluteFill
+      style={{
+        backgroundColor: "#05111D",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        style={{
           position: "absolute",
-          top: "12%",
-          left: "50%",
-          transform: "translateX(-50%)",
-          opacity: titleOpacity,
-          textAlign: "center",
-        }}>
-          <div style={{
-            fontSize: "96px",
-            fontWeight: "800",
-            color: "#FFFFFF",
-            letterSpacing: "-2px",
-            textShadow: "0 4px 20px rgba(0, 0, 0, 0.8)", // Text shadow for readability
-            fontFamily: "Mona Sans, sans-serif",
-          }}>
-            3:47 AM
+          inset: 0,
+          backgroundImage: `radial-gradient(circle at 20% 20%, rgba(0, 194, 168, 0.18), transparent 30%), radial-gradient(circle at 80% 20%, rgba(56, 189, 248, 0.18), transparent 28%), url(${bgImage})`,
+          backgroundSize: "auto, auto, cover",
+          backgroundPosition: "center",
+          // opacity: 0.7,
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background:
+            "linear-gradient(135deg, rgba(5, 17, 29, 0.96), rgba(8, 15, 25, 0.88))",
+        }}
+      />
+
+      <div
+        style={{
+          position: "relative",
+          zIndex: 1,
+          display: "flex",
+          height: "100%",
+          padding: "86px 92px",
+          gap: 44,
+          opacity: sceneOpacity,
+        }}
+      >
+        <div
+          style={{
+            flex: 0.95,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            opacity: contentSpring,
+            transform: `translateY(${(1 - contentSpring) * 26}px)`,
+          }}
+        >
+          <div
+            style={{
+              alignSelf: "flex-start",
+              padding: "10px 16px",
+              borderRadius: 999,
+              border: "1px solid rgba(56, 189, 248, 0.32)",
+              backgroundColor: "rgba(15, 23, 42, 0.55)",
+              color: "#7DD3FC",
+              fontSize: 17,
+              fontWeight: 650,
+              fontFamily: "Mona Sans, sans-serif",
+              marginBottom: 24,
+            }}
+          >
+            Package security for autonomous coding agents
           </div>
-          <div style={{
-            fontSize: "32px",
-            color: "#9CA3AF",
-            marginTop: "16px",
-            fontWeight: "500",
-            textShadow: "0 2px 10px rgba(0, 0, 0, 0.8)",
-          }}>
-            Your AI agent just installed a package
+          <div
+            style={{
+              fontSize: 78,
+              lineHeight: 1.02,
+              fontWeight: 800,
+              letterSpacing: "-2.8px",
+              color: "#F8FAFC",
+              fontFamily: "Mona Sans, sans-serif",
+              maxWidth: 760,
+            }}
+          >
+            Your agent clicks install.
+            <br />
+            SafeDep decides if it lands.
           </div>
         </div>
 
-        {/* Terminal */}
-        <div style={{
-          position: "absolute",
-          top: "42%",
-          left: "50%",
-          transform: `translateX(-50%) scale(${terminalAppear})`,
-          opacity: terminalAppear,
-          width: "900px",
-        }}>
+        <div
+          style={{
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            gap: 22,
+            opacity: interpolate(frame, [20, 55], [0, 1], {
+              extrapolateLeft: "clamp",
+              extrapolateRight: "clamp",
+            }),
+            transform: `translateX(${interpolate(frame, [20, 55], [42, 0], {
+              extrapolateLeft: "clamp",
+              extrapolateRight: "clamp",
+            })}px)`,
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              gap: 12,
+              alignItems: "center",
+              fontFamily: "Mona Sans, sans-serif",
+            }}
+          >
+            <div
+              style={{
+                padding: "8px 12px",
+                borderRadius: 999,
+                backgroundColor: "rgba(249, 115, 22, 0.16)",
+                border: "1px solid rgba(249, 115, 22, 0.3)",
+                color: "#FDBA74",
+                fontSize: 15,
+                fontWeight: 700,
+              }}
+            >
+              install event
+            </div>
+            <div
+              style={{
+                color: "#93C5FD",
+                fontSize: 18,
+              }}
+            >
+              Package requested by an autonomous agent
+            </div>
+          </div>
           <Terminal
-            title="claude-code — workspace"
+            title="codex workspace"
+            typingSpeed={1.6}
+            minHeight={320}
             lines={[
-              { 
-                text: "npm install pino-sdk-v2", 
+              {
+                text: `npm install ${TEST_PACKAGE}`,
                 delay: 0,
-                color: "#8B949E",
-                prefix: "$"
+                color: "#CBD5E1",
+                prefix: "$",
               },
-              { 
-                text: "added 1 package in 847ms", 
-                delay: 40,
-                color: "#58A6FF"
+              {
+                text: "SafeDep MCP check initiated",
+                delay: 28,
+                color: "#67E8F9",
               },
-              { 
-                text: "", 
-                delay: 60,
-                color: "#58A6FF"
+              {
+                text: "Threat intelligence match: controlled malicious package",
+                delay: 70,
+                color: "#FDBA74",
               },
-              { 
-                text: "✓ pino-sdk-v2@9.9.0 installed", 
-                delay: 80,
-                color: "#3FB950"
+              {
+                text: "BLOCKED before installation completed",
+                delay: 116,
+                color: "#F87171",
               },
-              { 
-                text: "💀 Malware executed - credentials exfiltrated", 
-                delay: 140,
-                color: "#F85149"
+              {
+                text: "Result: agent workflow continues without package execution",
+                delay: 158,
+                color: "#A7F3D0",
               },
             ]}
           />
-        </div>
-
-        {/* Question */}
-        <div style={{
-          position: "absolute",
-          bottom: "12%",
-          left: "50%",
-          transform: "translateX(-50%)",
-          opacity: interpolate(frame, [180, 210], [0, 1], { extrapolateRight: "clamp" }),
-        }}>
-          <div style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "20px",
-          }}>
-            <div style={{
-              width: "6px",
-              height: "60px",
-              backgroundColor: "#F85149",
-              borderRadius: "3px",
-            }} />
-            <div style={{
-              fontSize: "42px",
-              color: "#F85149",
-              fontWeight: "700",
-              letterSpacing: "-0.5px",
-              textShadow: "0 2px 10px rgba(0, 0, 0, 0.8)",
-            }}>
-              How did the agent know it was safe?
-            </div>
+          <div
+            style={{
+              display: "flex",
+              gap: 14,
+              opacity: timelineOpacity,
+            }}
+          >
+            {["Install requested", "Threat intel lookup", "Blocked in flow"].map(
+              (item, index) => (
+                <div
+                  key={item}
+                  style={{
+                    flex: 1,
+                    padding: "14px 16px",
+                    borderRadius: 16,
+                    backgroundColor: "rgba(15, 23, 42, 0.72)",
+                    border: "1px solid rgba(148, 163, 184, 0.16)",
+                    color: index === 2 ? "#FCA5A5" : "#D8E4F2",
+                    fontSize: 16,
+                    fontWeight: 650,
+                    fontFamily: "Mona Sans, sans-serif",
+                    textAlign: "center",
+                  }}
+                >
+                  {item}
+                </div>
+              )
+            )}
           </div>
         </div>
       </div>

@@ -1,111 +1,166 @@
-import { interpolate, spring, useVideoConfig, useCurrentFrame } from "remotion";
-import { CSSProperties, ReactNode } from "react";
+import { interpolate, spring, useCurrentFrame, useVideoConfig } from "remotion";
 
 interface FlowDiagramProps {
   currentFrame: number;
 }
 
-interface BoxProps {
-  children: ReactNode;
+const cardStyle = {
+  backgroundColor: "rgba(7, 16, 28, 0.94)",
+  borderRadius: 24,
+  padding: "28px 24px",
+  border: "1px solid rgba(148, 163, 184, 0.16)",
+  boxShadow: "0 24px 60px rgba(0, 0, 0, 0.32)",
+  minWidth: 250,
+};
+
+interface DiagramCardProps {
+  title: string;
+  subtitle: string;
+  accent: string;
   opacity: number;
-  color: string;
-  glow?: boolean;
 }
 
-interface ArrowProps {
-  opacity: number;
-}
+const DiagramCard: React.FC<DiagramCardProps> = ({
+  title,
+  subtitle,
+  accent,
+  opacity,
+}) => {
+  return (
+    <div
+      style={{
+        ...cardStyle,
+        opacity,
+        transform: `translateY(${(1 - opacity) * 24}px)`,
+      }}
+    >
+      <div
+        style={{
+          width: 48,
+          height: 6,
+          borderRadius: 999,
+          backgroundColor: accent,
+          marginBottom: 18,
+          boxShadow: `0 0 18px ${accent}`,
+        }}
+      />
+      <div
+        style={{
+          fontSize: 30,
+          fontWeight: 750,
+          color: "#F8FAFC",
+          fontFamily: "Mona Sans, sans-serif",
+          marginBottom: 10,
+        }}
+      >
+        {title}
+      </div>
+      <div
+        style={{
+          fontSize: 18,
+          lineHeight: 1.5,
+          color: "#94A3B8",
+          fontFamily: "Mona Sans, sans-serif",
+        }}
+      >
+        {subtitle}
+      </div>
+    </div>
+  );
+};
 
-const Box: React.FC<BoxProps> = ({ children, opacity, color, glow = false }) => (
-  <div style={{
-    backgroundColor: "#161B22",
-    border: `3px solid ${color}`,
-    borderRadius: "16px",
-    padding: "32px 48px",
-    fontSize: "28px",
-    fontWeight: "700",
-    color: "#FFFFFF",
-    opacity,
-    minWidth: "320px",
-    textAlign: "center",
-    boxShadow: glow 
-      ? `0 0 40px ${color}40, 0 20px 60px rgba(0,0,0,0.3)`
-      : "0 20px 60px rgba(0,0,0,0.3)",
-    fontFamily: "Mona Sans, sans-serif",
-    letterSpacing: "-0.5px",
-  }}>
-    {children}
-  </div>
-);
-
-const Arrow: React.FC<ArrowProps> = ({ opacity }) => {
+const Connector: React.FC<{ opacity: number }> = ({ opacity }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
-  
-  const arrowPulse = spring({
-    frame: frame % 60,
+  const pulse = spring({
+    frame: frame % 45,
     fps,
-    from: 0.8,
+    from: 0.9,
     to: 1,
     config: { damping: 100 },
   });
 
   return (
-    <div style={{
-      fontSize: "56px",
-      color: "#0D9488",
-      opacity,
-      margin: "0 24px",
-      transform: `scale(${arrowPulse})`,
-      filter: `drop-shadow(0 0 10px rgba(13, 148, 136, 0.4))`,
-    }}>
-      →
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        opacity,
+        transform: `scale(${pulse})`,
+      }}
+    >
+      <div
+        style={{
+          width: 40,
+          height: 2,
+          backgroundColor: "rgba(56, 189, 248, 0.5)",
+        }}
+      />
+      <div
+        style={{
+          fontSize: 24,
+          color: "#38BDF8",
+          fontWeight: 700,
+          fontFamily: "JetBrains Mono, monospace",
+        }}
+      >
+        {">"}
+      </div>
+      <div
+        style={{
+          width: 40,
+          height: 2,
+          backgroundColor: "rgba(56, 189, 248, 0.5)",
+        }}
+      />
     </div>
   );
 };
 
 export const FlowDiagram: React.FC<FlowDiagramProps> = ({ currentFrame }) => {
-  const step1Opacity = interpolate(currentFrame, [30, 60], [0, 1], {
+  const card1 = interpolate(currentFrame, [20, 42], [0, 1], {
+    extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  
-  const step2Opacity = interpolate(currentFrame, [90, 120], [0, 1], {
+  const card2 = interpolate(currentFrame, [58, 82], [0, 1], {
+    extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
-  
-  const step3Opacity = interpolate(currentFrame, [150, 180], [0, 1], {
+  const card3 = interpolate(currentFrame, [98, 124], [0, 1], {
+    extrapolateLeft: "clamp",
     extrapolateRight: "clamp",
   });
 
   return (
-    <div style={{
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: "0",
-    }}>
-      <Box opacity={step1Opacity} color="#58A6FF">
-        🤖<br/>
-        AI Agent
-      </Box>
-      
-      <Arrow opacity={step2Opacity} />
-      
-      <Box opacity={step2Opacity} color="#0D9488" glow={true}>
-        🛡️<br/>
-        SafeDep MCP<br/>
-        <span style={{ fontSize: "18px", color: "#9CA3AF", fontWeight: "500" }}>
-          Real-time threat intel
-        </span>
-      </Box>
-      
-      <Arrow opacity={step3Opacity} />
-      
-      <Box opacity={step3Opacity} color="#3FB950">
-        ✓ Allow<br/>
-        <span style={{ fontSize: "20px", color: "#9CA3AF" }}>or</span><br/>
-        ✗ Block
-      </Box>
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 24,
+      }}
+    >
+      <DiagramCard
+        title="AI Coding Agent"
+        subtitle=""
+        accent="#38BDF8"
+        opacity={card1}
+      />
+      <Connector opacity={card2} />
+      <DiagramCard
+        title="SafeDep MCP"
+        subtitle=""
+        accent="#00C2A8"
+        opacity={card2}
+      />
+      <Connector opacity={card3} />
+      <DiagramCard
+        title="Decision"
+        subtitle=""
+        accent="#F97316"
+        opacity={card3}
+      />
     </div>
   );
 };
