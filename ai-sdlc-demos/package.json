@@ -1,0 +1,21 @@
+{
+  "name": "ai-sdlc-demos",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "remotion:studio": "remotion studio src/index.ts",
+    "remotion:render": "remotion render src/index.ts AINativeSDLCPhases out/ai-native-sdlc-phases.mp4",
+    "remotion:preview": "remotion preview src/index.ts"
+  },
+  "dependencies": {
+    "@remotion/cli": "^4.0.434",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "^4.0.434"
+  },
+  "devDependencies": {
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "typescript": "^5"
+  }
+}

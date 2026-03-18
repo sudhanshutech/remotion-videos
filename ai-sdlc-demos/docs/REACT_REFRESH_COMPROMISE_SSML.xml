@@ -1,0 +1,19 @@
+<speak version="1.0" xml:lang="en-US">
+  <voice name="en-US-AriaNeural">
+    <prosody rate="0%" pitch="0%">
+      <p>
+        <s>This attack starts with a fake npm package named react-refresh-update.</s>
+        <break time="350ms"/>
+        <s>It looks close enough to a trusted React package that a developer or agent can install it without noticing.</s>
+        <break time="450ms"/>
+        <s>During install, the package executes on the developer machine and reaches out to remote attacker infrastructure.</s>
+        <break time="450ms"/>
+        <s>That server can then choose platform-specific payloads for Windows, Linux, or macOS.</s>
+        <break time="500ms"/>
+        <s>At that point, the compromise moves beyond one package into workstation access, tokens, and developer credentials.</s>
+        <break time="500ms"/>
+        <s>This is why package trust has to be verified before install, not after execution.</s>
+      </p>
+    </prosody>
+  </voice>
+</speak>
